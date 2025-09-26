@@ -15,3 +15,15 @@ it("Test that a ship is not sunk", () => {
   ship.hit();
   expect(ship.isSunk()).toBeFalsy();
 });
+
+it("Test that the hit counter is incremented", () => {
+  let ship = new Ship(3);
+  ship.hit();
+  expect(ship.noHits).toBe(1);
+});
+
+it("Test that the hit counter is incremented (negative)", () => {
+  let ship = new Ship(3);
+  ship.hit();
+  expect(ship.noHits).not.toBe(2);
+});
