@@ -147,3 +147,106 @@ it("Receive an attack in a cell occupied by a ship AND that has been attacked be
 
   expect(actual).toEqual(expected);
 });
+
+it("Reports if all ships are sunk", () => {
+  const board = new Gameboard();
+  Ship.mockImplementation((length) => ({
+    length,
+    hit: jest.fn(),
+    isSunk: jest.fn(() => true),
+  }));
+  const mockShip = new Ship(2);
+  const mockShip2 = new Ship(4);
+
+  board.placeShip(mockShip, 0, 0);
+  board.placeShip(mockShip2, 4, 2);
+
+  board.receiveAttack(0, 0);
+  board.receiveAttack(0, 0);
+  board.receiveAttack(4, 2);
+  board.receiveAttack(4, 3);
+  board.receiveAttack(4, 4);
+  board.receiveAttack(4, 5);
+
+  const actual = board.isFleetSunk();
+  expect(actual).toBeTruthy();
+});
+
+it("Reports that not all ships are sunk with no attacks received", () => {
+  const board = new Gameboard();
+  Ship.mockImplementation((length) => ({
+    length,
+    hit: jest.fn(),
+    isSunk: jest.fn(() => false),
+  }));
+  const mockShip = new Ship(2);
+  const mockShip2 = new Ship(4);
+  const mockShip3 = new Ship(5);
+  const mockShip4 = new Ship(3);
+  const mockShip5 = new Ship(2);
+
+  board.placeShip(mockShip, 0, 0);
+  board.placeShip(mockShip2, 4, 2);
+  board.placeShip(mockShip3, 5, 5);
+  board.placeShip(mockShip4, 6, 0);
+  board.placeShip(mockShip5, 0, 2);
+
+  const actual = board.isFleetSunk();
+  expect(actual).toBeFalsy();
+});
+
+it("Reports that not all ships are sunk if a ship is damaged", () => {
+  const board = new Gameboard();
+  Ship.mockImplementation((length) => ({
+    length,
+    hit: jest.fn(),
+    isSunk: jest.fn(() => false),
+  }));
+  const mockShip = new Ship(2);
+  const mockShip2 = new Ship(4);
+  const mockShip3 = new Ship(5);
+  const mockShip4 = new Ship(3);
+  const mockShip5 = new Ship(2);
+
+  board.placeShip(mockShip, 0, 0);
+  board.placeShip(mockShip2, 4, 2);
+  board.placeShip(mockShip3, 5, 5);
+  board.placeShip(mockShip4, 6, 0);
+  board.placeShip(mockShip5, 0, 2);
+
+  board.receiveAttack(5, 6);
+
+  const actual = board.isFleetSunk();
+  expect(actual).toBeFalsy();
+});
+
+it("Reports that not all ships are sunk if all but one ship has been sunk", () => {
+  const board = new Gameboard();
+  Ship.mockImplementation((length) => ({
+    length,
+    hit: jest.fn(),
+    isSunk: jest.fn(() => false),
+  }));
+  const mockShip = new Ship(2);
+  const mockShip2 = new Ship(4);
+  const mockShip3 = new Ship(5);
+  const mockShip4 = new Ship(3);
+  const mockShip5 = new Ship(2);
+
+  const ships = [
+    { ship: mockShip, coords: board.placeShip(mockShip, 0, 0) },
+    { ship: mockShip2, coords: board.placeShip(mockShip2, 4, 2) },
+    { ship: mockShip3, coords: board.placeShip(mockShip3, 5, 5) },
+    { ship: mockShip4, coords: board.placeShip(mockShip4, 6, 0) },
+    { ship: mockShip5, coords: board.placeShip(mockShip5, 0, 2) },
+  ];
+
+  // Call receiveAttack on every coordinate of every ship except one (leave one unsunk)
+  ships.slice(0, -1).forEach(({ coords }) => {
+    coords.forEach(([x, y]) => board.receiveAttack(x, y));
+  });
+
+  // Now test isFleetSunk
+  const actual = board.isFleetSunk();
+  expect(actual).toBeFalsy();
+});

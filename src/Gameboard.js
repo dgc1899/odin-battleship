@@ -82,6 +82,26 @@ class Gameboard {
     }
     return result;
   }
+
+  #getShips() {
+    let ships = new Set();
+    for (let row of this.#board) {
+      for (let cell of row) {
+        if (cell.ship) ships.add(cell.ship);
+      }
+    }
+    return Array.from(ships);
+  }
+
+  isFleetSunk() {
+    let uniqueShips = this.#getShips();
+    for (let ship of uniqueShips) {
+      if (!ship.isSunk()) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 export { Gameboard };
