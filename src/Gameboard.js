@@ -1,5 +1,3 @@
-import { Ship } from "../src/Ship.js";
-
 class Gameboard {
   #board;
 
