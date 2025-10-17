@@ -28,7 +28,7 @@ class Gameboard {
     const boundary = 10;
     let resultCoords = [];
     //TODO vertical implementation
-    if (x < boundary && y + ship.length <= boundary) {
+    if (x > boundary && y + ship.length <= boundary) {
       for (let i = 0; i < ship.length; i++) {
         resultCoords.push([x, y + i]);
         if (!this.#isCoordinateAlreadyOccupied(resultCoords[i])) {
