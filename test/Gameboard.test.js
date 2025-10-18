@@ -105,7 +105,11 @@ it("Receive an attack in an invalid cell", () => {
 
 it("Receive an attack in a cell occupied by a ship", () => {
   const board = new Gameboard();
-  Ship.mockImplementation((length) => ({ length, hit: jest.fn() }));
+  Ship.mockImplementation((length) => ({
+    length,
+    hit: jest.fn(),
+    isSunk: jest.fn(),
+  }));
   const ship = new Ship(3);
   const expected = {
     shipHit: ship,
@@ -133,7 +137,11 @@ it("Receive an attack in a cell that was already attacked before", () => {
 
 it("Receive an attack in a cell occupied by a ship AND that has been attacked before", () => {
   const board = new Gameboard();
-  Ship.mockImplementation((length) => ({ length, hit: jest.fn() }));
+  Ship.mockImplementation((length) => ({
+    length,
+    hit: jest.fn(),
+    isSunk: jest.fn(),
+  }));
   const mockShip = new Ship(5);
   board.placeShip(mockShip, 2, 3);
   board.receiveAttack(2, 5);
