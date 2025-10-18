@@ -2,8 +2,12 @@ class GameboardView {
   #playerId;
   #gameboardObj;
   #boardContainer;
+  #isCensored = false;
 
   constructor(gameboardObj, playerId) {
+    if (playerId == "player2") {
+      this.#isCensored = true;
+    }
     this.#playerId = playerId;
     this.#gameboardObj = gameboardObj;
     this.#setupBoard();
@@ -15,11 +19,13 @@ class GameboardView {
     const boardDiv = document.createElement("div");
     boardDiv.classList.add(`board`);
     boardDiv.classList.add(`${this.#playerId}`);
+    boardDiv.dataset.hidden = this.#isCensored;
 
     squares.forEach((square) => {
       boardDiv.appendChild(square);
     });
     this.#boardContainer.appendChild(boardDiv);
+    boardDiv.addEventListener("click", (e) => this.#receiveAttack(e));
   }
 
   #initializeBoardSquares() {
@@ -32,7 +38,7 @@ class GameboardView {
         square.dataset.xCoord = j;
         square.dataset.yCoord = i;
         square.dataset.ship = "undefined";
-        square.dataset.attacked = "undefined";
+        square.dataset.attacked = false;
         boardSquares.push(square);
       }
     }
@@ -43,6 +49,35 @@ class GameboardView {
     return document.querySelector(
       `div.${this.#playerId} > div.board-square[data-x-coord='${x}'][data-y-coord='${y}']`,
     );
+  }
+
+  #receiveAttack(e) {
+    const attackedSquare = e.target;
+    let hitCoordinate = undefined;
+    if (attackedSquare.dataset.attacked == "false") {
+      e.target.dataset.attacked = true;
+      //Call to the Gameboard obj method
+      hitCoordinate = this.#gameboardObj.receiveAttack(
+        attackedSquare.dataset.xCoord,
+        attackedSquare.dataset.yCoord,
+      );
+      console.log(
+        `Coordinate hit: ${hitCoordinate.xCoord}, ${hitCoordinate.yCoord}`,
+      );
+      const isGameOver = this.#gameboardObj.isFleetSunk();
+      if (isGameOver) {
+        this.#renderGameOver();
+      }
+    } else {
+      console.log("Coordinate already hit");
+    }
+  }
+
+  #renderGameOver() {
+    this.#boardContainer.remove();
+    const gameOverTitle = document.createElement("div");
+    gameOverTitle.textContent = "Game over";
+    document.body.appendChild(gameOverTitle);
   }
 
   render() {

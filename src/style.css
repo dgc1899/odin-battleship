@@ -67,11 +67,27 @@ h1, h2, h3, h4, h5, h6 {
   border-color: black;
   width: 32px;
   height: 32px;
+  background-color: gray;
+}
+
+div[data-hidden="true"] {
+  .board-square {
+    background-color: white;
+  }
+}
+
+
+.board-square[data-ship="undefined"][data-attacked="false"] {
+  background-color: white;
+}
+
+.board-square[data-ship="undefined"][data-attacked="true"] {
   background-color: blue;
 }
 
-.board-square[data-ship="undefined"] {
+.board-square:not([data-ship="undefined"])[data-attacked="true"] {
   background-color: red;
 }
+
 
 

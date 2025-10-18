@@ -8,8 +8,10 @@ class Gameboard {
   #fillArray() {
     this.#board = [];
     for (let i = 0; i < 10; i++) {
-      this.#board[i] = new Array(10);
-      this.#board[i].fill({ ship: undefined, attacked: false });
+      this.#board[i] = [];
+      for (let j = 0; j < 10; j++) {
+        this.#board[i][j] = { ship: undefined, attacked: false };
+      }
     }
   }
 
@@ -28,7 +30,7 @@ class Gameboard {
     const boundary = 10;
     let resultCoords = [];
     //TODO vertical implementation
-    if (x > boundary && y + ship.length <= boundary) {
+    if (x <= boundary && x >= 0 && y + ship.length <= boundary) {
       for (let i = 0; i < ship.length; i++) {
         resultCoords.push([x, y + i]);
         if (!this.#isCoordinateAlreadyOccupied(resultCoords[i])) {
@@ -70,6 +72,7 @@ class Gameboard {
           xCoord: x,
           yCoord: y,
         };
+        attackedCoord["ship"].isSunk();
       } else {
         result = {
           shipHit: undefined,
