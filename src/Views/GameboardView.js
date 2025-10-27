@@ -34,7 +34,6 @@ class GameboardView {
       for (let j = 0; j < 10; j++) {
         const square = document.createElement("div");
         square.classList.add("board-square");
-        square.textContent = `${j},${i}`;
         square.dataset.xCoord = j;
         square.dataset.yCoord = i;
         square.dataset.ship = "undefined";

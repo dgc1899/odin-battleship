@@ -48,45 +48,63 @@ h1, h2, h3, h4, h5, h6 {
 
 /* END OF RESET */
 
+:root {
+  --water: #aadaff;
+  --water-miss: #69a2c7;
+  --ship-hit: #ff5c5c;
+  --ship-color: #808080;
+  --board-border: #333;
+  --background: #f0f8ff;
+  --ship-zone-bg: #d3d3d3;
+}
+
+body {
+  /* 4. Add accessible line-height */
+  line-height: 1.5;
+  /* 5. Improve text rendering */
+  -webkit-font-smoothing: antialiased;
+  background-color: var(--background);
+  font-family: sans-serif;
+  padding: 2rem;
+}
+
 .board-container {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  align-items: start;
   flex-direction: row;
-  gap: 32px;
+  gap: 64px;
 }
 
 .board {
   display: grid;
-  grid-template-columns: repeat(10, 2fr);
-  grid-template-rows: repeat(10, 2fr)
+  grid-template-columns: repeat(10, 32px);
+  grid-template-rows: repeat(10, 32px);
+  gap: 2px;
+  border: 2px solid var(--board-border);
 }
 
 .board-square {
-  border-style: solid;
-  border-color: black;
   width: 32px;
   height: 32px;
-  background-color: gray;
+  background-color: var(--water);
+  transition: background-color 0.2s ease-in-out;
 }
 
-div[data-hidden="true"] {
-  .board-square {
-    background-color: white;
-  }
+.clickable .board-square:hover {
+  background-color: lightblue;
+  cursor: pointer;
 }
 
-
-.board-square[data-ship="undefined"][data-attacked="false"] {
-  background-color: white;
+.board:not([data-hidden="true"]) .board-square[data-ship]:not([data-ship="undefined"]):not([data-attacked="true"]) {
+  background-color: var(--ship-color);
 }
 
-.board-square[data-ship="undefined"][data-attacked="true"] {
-  background-color: blue;
+.board-square[data-attacked="true"][data-ship="undefined"] {
+  background-color: var(--water-miss);
 }
 
-.board-square:not([data-ship="undefined"])[data-attacked="true"] {
-  background-color: red;
+.board-square[data-attacked="true"]:not([data-ship="undefined"]) {
+  background-color: var(--ship-hit);
 }
 
 .shipzone {
@@ -94,12 +112,37 @@ div[data-hidden="true"] {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  background-color: gray;
-
-  .ship {
-    background-color: blue;
-  }
+  background-color: var(--ship-zone-bg);
+  padding: 1rem;
+  border-radius: 8px;
 }
+
+.ship {
+  background-color: var(--ship-color);
+  border-radius: 4px;
+  cursor: move;
+}
+
+button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+  background-color: #4CAF50;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
 
 
 

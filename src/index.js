@@ -1,6 +1,5 @@
 import "./style.css";
 import { GameboardView } from "./Views/GameboardView";
-import { Gameboard } from "./Gameboard";
 import { Ship } from "./Ship";
 import { Player } from "./Player";
 
@@ -12,7 +11,7 @@ let gameBoardView1;
 let gameBoardView2;
 window.currentPlayer = undefined;
 
-const callbackShipZone = (mutationList, observer) => {
+const callbackShipZone = (mutationList) => {
   for (const mutation of mutationList) {
     if (mutation.type == "childList") {
       if (mutation.nextSibling == null) {
@@ -51,7 +50,7 @@ function initializeShipZone() {
       e.dataTransfer.effectAllowed = "move";
       e.dataTransfer.setData("application/json", JSON.stringify(ship));
     });
-    shipSquare.addEventListener("dragend", (e) => {
+    shipSquare.addEventListener("dragend", () => {
       shipSquare.removeAttribute("id");
     });
     shipZoneDiv.appendChild(shipSquare);
@@ -89,7 +88,7 @@ function setupGame() {
   );
   gameBoardView2 = new GameboardView(
     player2.board,
-    false,
+    true,
     (hitCoordinate, isGameOver) => handleTurn(hitCoordinate, isGameOver),
   );
   gameBoardView1.render();
