@@ -43,6 +43,14 @@ class Ship {
   hit() {
     this.#noHits++;
   }
+
+  toJSON() {
+    return {
+      length: this.#length,
+      noHits: this.#noHits,
+      sunk: this.#sunk,
+    };
+  }
 }
 
 export { Ship };

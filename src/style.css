@@ -89,5 +89,17 @@ div[data-hidden="true"] {
   background-color: red;
 }
 
+.shipzone {
+  margin: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: gray;
+
+  .ship {
+    background-color: blue;
+  }
+}
+
 
 

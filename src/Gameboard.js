@@ -1,3 +1,4 @@
+import { Ship } from "./Ship";
 class Gameboard {
   #board;
 
@@ -26,7 +27,10 @@ class Gameboard {
     return false;
   }
 
-  placeShip(ship, x, y) {
+  placeShip(shipData, xString, yString) {
+    const ship = new Ship(shipData.length);
+    const x = parseInt(xString);
+    const y = parseInt(yString);
     const boundary = 10;
     let resultCoords = [];
     //TODO vertical implementation
@@ -36,7 +40,7 @@ class Gameboard {
         if (!this.#isCoordinateAlreadyOccupied(resultCoords[i])) {
           this.#board[x][y + i] = { ship: ship, attacked: false };
         } else {
-          throw new Error("Space is already occupied!");
+          return [];
         }
       }
     }

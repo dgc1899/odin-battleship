@@ -39,6 +39,37 @@ class GameboardView {
         square.dataset.yCoord = i;
         square.dataset.ship = "undefined";
         square.dataset.attacked = false;
+        if (!this.#isCensored) {
+          square.addEventListener("dragover", (e) => {
+            if (e.dataTransfer.types.includes("application/json")) {
+              e.preventDefault();
+              console.log(
+                `Now dragging over: ${square.dataset.xCoord}, ${square.dataset.yCoord}`,
+              );
+            }
+          });
+          square.addEventListener("drop", (e) => {
+            e.preventDefault();
+
+            const draggedShip = document.getElementById("dragged-ship");
+
+            const shipData = JSON.parse(
+              e.dataTransfer.getData("application/json"),
+            );
+            const placeShipResult = this.#gameboardObj.placeShip(
+              shipData,
+              e.target.dataset.xCoord,
+              e.target.dataset.yCoord,
+            );
+
+            if (placeShipResult.length != 0) {
+              draggedShip.remove();
+            }
+            console.log("Successful drop");
+            this.render();
+          });
+        }
+
         boardSquares.push(square);
       }
     }
