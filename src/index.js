@@ -70,8 +70,8 @@ function setUpEnemyBoard() {
       randomCoords[0],
       randomCoords[1],
     );
-    const invalidPosition = [];
-    while (result == invalidPosition) {
+
+    while (result.length == 0) {
       randomCoords = generateRandomCoords();
       result = player2.board.placeShip(ship, randomCoords[0], randomCoords[1]);
     }
@@ -89,7 +89,7 @@ function setupGame() {
   );
   gameBoardView2 = new GameboardView(
     player2.board,
-    true,
+    false,
     (hitCoordinate, isGameOver) => handleTurn(hitCoordinate, isGameOver),
   );
   gameBoardView1.render();
