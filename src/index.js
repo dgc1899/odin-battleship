@@ -1,43 +1,135 @@
 import "./style.css";
 import { GameboardView } from "./Views/GameboardView";
-import { Gameboard } from "./Gameboard";
 import { Ship } from "./Ship";
 import { Player } from "./Player";
 
 // driver code
-const startButton = document.createElement("button");
-startButton.textContent = "Start game";
-startButton.addEventListener("click", startGame);
+// make core state accessible to other functions (attach currentPlayer to window so other modules can read it)
+let player1;
+let player2;
+let gameBoardView1;
+let gameBoardView2;
+window.currentPlayer = undefined;
 
-document.body.appendChild(startButton);
+const callbackShipZone = (mutationList) => {
+  for (const mutation of mutationList) {
+    if (mutation.type == "childList") {
+      if (mutation.nextSibling == null) {
+        const startGameButton = document.querySelector("button");
+        startGameButton.disabled = false;
+      }
+    }
+  }
+};
 
-function startGame() {
-  let player1 = new Player("Joe");
-  let player2 = new Player("Jane");
+function generateRandomCoords() {
+  return [Math.floor(Math.random() * 10), Math.floor(Math.random() * 10)];
+}
 
-  let gameBoardView1 = new GameboardView(player1.board, "player1");
-  let gameBoardView2 = new GameboardView(player2.board, "player2");
+function setUpShipZoneDivObserver(shipZoneDiv) {
+  const config = { attributes: false, childList: true, subtree: true };
+  const observer = new MutationObserver(callbackShipZone);
+  observer.observe(shipZoneDiv, config);
+}
 
-  let ship1 = new Ship(2);
-  let ship2 = new Ship(3);
-  let ship3 = new Ship(4);
-  let ship4 = new Ship(5);
+function initializeShipZone() {
+  const shipZoneDiv = document.createElement("div");
+  shipZoneDiv.classList.add("shipzone");
+  let ships = [new Ship(2), new Ship(3), new Ship(4), new Ship(5)];
 
-  let ship5 = new Ship(2);
-  let ship6 = new Ship(3);
-  let ship7 = new Ship(4);
-  let ship8 = new Ship(5);
+  ships.forEach((ship) => {
+    let shipSquare = undefined;
+    shipSquare = document.createElement("div");
+    shipSquare.classList.add("ship");
+    shipSquare.classList.add(ship.length);
+    shipSquare.style.height = "32px";
+    shipSquare.style.width = `${32 * ship.length}px`;
+    shipSquare.draggable = true;
+    shipSquare.addEventListener("dragstart", (e) => {
+      shipSquare.id = "dragged-ship";
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("application/json", JSON.stringify(ship));
+    });
+    shipSquare.addEventListener("dragend", () => {
+      shipSquare.removeAttribute("id");
+    });
+    shipZoneDiv.appendChild(shipSquare);
+  });
+  setUpShipZoneDivObserver(shipZoneDiv);
+  document.body.appendChild(shipZoneDiv);
+}
 
-  player1.board.placeShip(ship1, 0, 0);
-  player1.board.placeShip(ship2, 1, 0);
-  player1.board.placeShip(ship3, 2, 0);
-  player1.board.placeShip(ship4, 3, 0);
+function setUpEnemyBoard() {
+  let ships = [new Ship(2), new Ship(3), new Ship(4), new Ship(5)];
 
-  player2.board.placeShip(ship6, 5, 5);
-  player2.board.placeShip(ship6, -1, 0);
+  ships.forEach((ship) => {
+    let randomCoords = generateRandomCoords();
+    let result = player2.board.placeShip(
+      ship,
+      randomCoords[0],
+      randomCoords[1],
+    );
 
+    while (result.length == 0) {
+      randomCoords = generateRandomCoords();
+      result = player2.board.placeShip(ship, randomCoords[0], randomCoords[1]);
+    }
+  });
+}
+
+player1 = new Player("Joe");
+player2 = new Player("Jane");
+
+function setupGame() {
+  gameBoardView1 = new GameboardView(
+    player1.board,
+    false,
+    (hitCoordinate, isGameOver) => handleTurn(hitCoordinate, isGameOver),
+  );
+  gameBoardView2 = new GameboardView(
+    player2.board,
+    true,
+    (hitCoordinate, isGameOver) => handleTurn(hitCoordinate, isGameOver),
+  );
   gameBoardView1.render();
   gameBoardView2.render();
 
-  document.body.removeChild(startButton);
+  const startButton = document.createElement("button");
+  startButton.textContent = "Start game";
+  startButton.addEventListener("click", startGame);
+  initializeShipZone();
+
+  document.body.appendChild(startButton);
+  startButton.disabled = true;
 }
+
+function startGame() {
+  // human (player1) starts
+  window.currentPlayer = "player1";
+
+  setUpEnemyBoard();
+  gameBoardView1.render();
+  gameBoardView2.render();
+
+  gameBoardView2.makeBoardClickable();
+  document.body.removeChild(document.querySelector("button"));
+}
+
+function handleTurn(hitCoordinate, isGameOver) {
+  if (isGameOver) {
+    gameBoardView1.renderGameOver();
+  } else {
+    if (window.currentPlayer == "player1") {
+      gameBoardView2.makeBoardUnclickable();
+      gameBoardView1.makeBoardClickable();
+      window.currentPlayer = "player2";
+      player2.sendAttack(player1.board);
+      gameBoardView1.render();
+      window.currentPlayer = "player1";
+      gameBoardView1.makeBoardUnclickable();
+      gameBoardView2.makeBoardClickable();
+    }
+  }
+}
+
+setupGame();
